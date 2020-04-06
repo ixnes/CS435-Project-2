@@ -1,9 +1,9 @@
-#include "Graph.h"
+#include "DirectedGraph.h"
 
 #include <algorithm>
 #include <iostream>
 
-void Graph::addNode(string nodeVal) {
+void DirectedGraph::addNode(string nodeVal) {
     Node *n = new Node(nodeVal);
     nodes.insert(n);
 }
@@ -13,9 +13,9 @@ static void checkAndAdd(Node *a, Node *b) {
         a->neighbors.push_back(b);
 }
 
-void Graph::addUndirectedEdge(Node *first, Node *second) {
+void DirectedGraph::addDirectedEdge(Node *first, Node *second) {
     checkAndAdd(first, second);
-    checkAndAdd(second, first);
+    //checkAndAdd(second, first);
 }
 
 static void checkAndRemove(Node *a, Node *b) {
@@ -24,17 +24,17 @@ static void checkAndRemove(Node *a, Node *b) {
         a->neighbors.erase(i);
 }
 
-void Graph::removeUndirectedEdge(Node *first, Node *second) {
+void DirectedGraph::removeDirectedEdge(Node *first, Node *second) {
     checkAndRemove(first, second);
-    checkAndRemove(second, first);
+    //checkAndRemove(second, first);
 }
 
 //This horrific function returns the Node with the specified name
-Node *Graph::getNode(string name) {
+Node *DirectedGraph::getNode(string name) {
     return *find_if(nodes.begin(), nodes.end(), [name](Node *n){ return n->name.compare(name) == 0; });
 }
 
-void Graph::printGraph() {
+void DirectedGraph::printGraph() {
     for (auto i = nodes.begin(); i != nodes.end(); i++) {
         cout << (*i)->name << ": ";
 

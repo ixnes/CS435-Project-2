@@ -11,26 +11,28 @@
 #include <unordered_map>
 #include <vector>
 
+//using namespace std;
+
 class GraphSearch {
 private:
     //DEBUG
     static void printTraversal(vector<Node *> *traversal) {
         if (traversal == nullptr) {
-            cout << "Null" << endl;
+            std::cout << "Null" << endl;
             return;
         }
         
         if (traversal->size() == 0) {
-            cout << "Empty" << endl;
+            std::cout << "Empty" << endl;
             return;
         }
-        cout << (*traversal)[0]->name;
+        std::cout << (*traversal)[0]->name;
 
         for (int i = 1; i < (*traversal).size(); i++) {
-            cout << " , " << (*traversal)[i]->name;
+            std::cout << " , " << (*traversal)[i]->name;
         }
 
-        cout << endl;
+        std::cout << endl;
     }
 
     static unordered_map<Node *, bool> visited;

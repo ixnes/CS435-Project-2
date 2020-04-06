@@ -1,5 +1,5 @@
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef DIRECTEDGRAPH_H
+#define DIRECTEDGRAPH_H
 
 #include "Node.h"
 
@@ -9,13 +9,13 @@
 
 using namespace std;
 
-class Graph {
+class DirectedGraph {
 private:
     unordered_set<Node *> nodes;
 public:
     void addNode(string nodeVal);
-    void addUndirectedEdge(Node *first, Node *second);
-    void removeUndirectedEdge(Node *first, Node *second);
+    void addDirectedEdge(Node *first, Node *second);
+    void removeDirectedEdge(Node *first, Node *second);
 
     unordered_set<Node *> getAllNodes() {
         return nodes;
