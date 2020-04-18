@@ -4,29 +4,22 @@
 #include <iostream>
 
 void WeightedGraph::addNode(string nodeVal) {
-    WeightedNode *n = new WeightedNode(nodeVal);
+    Node *n = new Node(nodeVal);
     nodes.insert(n);
 }
 
-void WeightedGraph::addWeightedEdge(WeightedNode *first, WeightedNode *second, int edgeWeight) {
+void WeightedGraph::addWeightedEdge(Node *first, Node *second, int edgeWeight) {
     first->neighbors[second] = edgeWeight;
-    //checkAndAdd(second, first);
 }
 
-static void checkAndRemove(WeightedNode *a, WeightedNode *b) {
-    auto i = a->neighbors.find(b);
-    if (i != a->neighbors.end())
-        a->neighbors.erase(i);
+void WeightedGraph::removeWeightedEdge(Node *first, Node *second) {
+    first->neighbors.erase(second);
 }
 
-void WeightedGraph::removeWeightedEdge(WeightedNode *first, WeightedNode *second) {
-    checkAndRemove(first, second);
-    //checkAndRemove(second, first);
-}
-
-//This horrific function returns the Node with the specified name
-WeightedNode *WeightedGraph::getNode(string name) {
-    return *find_if(nodes.begin(), nodes.end(), [name](WeightedNode *n){ return n->name.compare(name) == 0; });
+Node *WeightedGraph::getNode(string name) {
+    for (auto it = nodes.begin(); it != nodes.end(); it++)
+        if ((*it)->name.compare(name) == 0)
+            return *it;
 }
 
 void WeightedGraph::printGraph() {

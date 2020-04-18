@@ -46,7 +46,8 @@ private:
 
         setVisited(start);
 
-        for (Node *& node:start->neighbors) {
+        for (pair<Node*, int> p:start->neighbors) {
+            Node * node = p.first;
             if (isVisited(node))
                 continue;
 
@@ -71,11 +72,13 @@ private:
         vector<Node *> *fwd = new vector<Node *>();
 
         for (Node * const& n : *nodes)
-            for (Node * const& neighbor : n->neighbors)
+            for (pair<Node *, int> p : n->neighbors) {
+                Node *neighbor = p.first;
                 if (!isVisited(neighbor)) {
                     fwd->push_back(neighbor);
                     setVisited(neighbor);
                 }
+            }
 
         vector<Node *> *bft = BFTRec_(fwd);
 
@@ -145,7 +148,8 @@ public:
             
             setVisited(curr);
 
-            for (Node *& node:curr->neighbors) {
+            for (pair<Node *, int> p:curr->neighbors) {
+                Node * node = p.first;
                 if (isVisited(node))
                     continue;
 
@@ -219,7 +223,8 @@ public:
                     setVisited(curr);
                     ret->push_back(curr);
 
-                    for (Node * const& neighbor : curr->neighbors) {
+                    for (pair<Node *, int> p: curr->neighbors) {
+                        Node *neighbor = p.first;
                         if (!isVisited(neighbor))
                             q->push(neighbor);
                     }

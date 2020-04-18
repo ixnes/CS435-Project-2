@@ -1,6 +1,7 @@
 #include "GridGraph.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 
 void GridGraph::addNode(int x, int y, string nodeVal) {
@@ -8,41 +9,28 @@ void GridGraph::addNode(int x, int y, string nodeVal) {
     nodes.insert(n);
 }
 
-static void checkAndAdd(GridNode *a, GridNode *b) {
-    if (find(a->neighbors.begin(), a->neighbors.end(), b) == a->neighbors.end())
-        a->neighbors.push_back(b);
-}
-
 void GridGraph::addUndirectedEdge(GridNode *first, GridNode *second) {
-    int xDiff = first->x - second->x;
-    if (xDiff < 0)
-        xDiff *= -1;
+    int xDiff = abs(first->x - second->x);
 
-    int yDiff = first->y - second->y;
-    if (yDiff < 0)
-        yDiff *= -1;
+    int yDiff = abs(first->y - second->y);
     
     if (xDiff + yDiff != 1)
         return;
 
-    checkAndAdd(first, second);
-    checkAndAdd(second, first);
-}
-
-static void checkAndRemove(GridNode *a, GridNode *b) {
-    auto i = find(a->neighbors.begin(), a->neighbors.end(), b);
-    if (i != a->neighbors.end())
-        a->neighbors.erase(i);
+    first->neighbors[second] = 1;
+    second->neighbors[first] = 1;
 }
 
 void GridGraph::removeUndirectedEdge(GridNode *first, GridNode *second) {
-    checkAndRemove(first, second);
-    checkAndRemove(second, first);
+    first->neighbors.erase(second);
+    second->neighbors.erase(first);
 }
 
 //This horrific function returns the GridNode with the specified name
 GridNode *GridGraph::getNode(string name) {
-    return *find_if(nodes.begin(), nodes.end(), [name](GridNode *n){ return n->name.compare(name) == 0; });
+    for (auto it = nodes.begin(); it != nodes.end(); it++)
+        if ((*it)->name.compare(name) == 0)
+            return *it;
 }
 
 void GridGraph::printGraphDBG() {
@@ -55,11 +43,11 @@ void GridGraph::printGraphDBG() {
         }
 
         auto j = (*i)->neighbors.begin();
-        cout << (*j)->name;
+        cout << (*j).first->name;
         j++;
 
         for ( ; j != (*i)->neighbors.end(); j++)
-            cout << " , " << (*j)->name;
+            cout << " , " << (*j).first->name;
         
         cout << endl;
     }
@@ -96,7 +84,7 @@ void GridGraph::printGraph() {
         out[2*n.y][2*n.x] = 'O';
 
         for (auto j = n.neighbors.begin(); j != n.neighbors.end(); j++)
-            out[n.y + (*j)->y][n.x + (*j)->x] = '#';
+            out[n.y + ((GridNode *)(*j).first)->y][n.x + ((GridNode *)(*j).first)->x] = '#';
     }
 
     for (int i = 0; i < 2*yMax + 1; i++) {

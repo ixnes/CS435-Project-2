@@ -89,8 +89,8 @@ void printTraversal(vector<Node *> *traversal) {
     std::cout << endl;
 }
 
-void printDijkstra(unordered_map<WeightedNode *, int> *result) {
-    for (pair<WeightedNode *, int> p : *result) {
+void printDijkstra(unordered_map<Node *, int> *result) {
+    for (pair<Node *, int> p : *result) {
         cout << p.first->name << ": " << p.second << endl;
     }
 }
@@ -108,18 +108,19 @@ void initializeRandomNumberGenerator() {
 WeightedGraph *createRandomWeightedGraph(int n) {
     WeightedGraph *ret = new WeightedGraph();
 
-    vector<WeightedNode *> tmp;
+    vector<Node *> tmp;
 
     for (int i = 0; i < n; i++) {
         ret->addNode(getNodeName(i));
     }
 
+    //copies unordered_set nodes into a temporary vector for random access
     copy(ret->getAllNodes().begin(), ret->getAllNodes().end(), back_inserter(tmp));
 
     for (auto from = tmp.begin(); from != tmp.end(); from++) {
         int numEdges = getNumberofEdges();
         for (int j = 0; j < numEdges; j++) {
-            WeightedNode *to = tmp[getRandomNumber(0, n - 1)];
+            Node *to = tmp[getRandomNumber(0, n - 1)];
             ret->addWeightedEdge(*from, to, getRandomNumber(1, 100));
         }
     }
@@ -143,7 +144,8 @@ Graph *createRandomUnweightedGraphIter(int n) {
     for (int i = 0; i < n; i++) {
         ret->addNode(getNodeName(i));
     }
-
+    
+    //copies unordered_set nodes into a temporary vector for random access
     copy(ret->getAllNodes().begin(), ret->getAllNodes().end(), back_inserter(tmp));
 
     for (auto from = tmp.begin(); from != tmp.end(); from++) {
@@ -203,6 +205,7 @@ DirectedGraph *createRandomDAGIter(int n) {
         ret->addNode(getNodeName(i));
     }
 
+    //copies unordered_set nodes into a temporary vector for random access
     copy(ret->getAllNodes().begin(), ret->getAllNodes().end(), back_inserter(tmp));
 
     for (int i = 0; i < tmp.size(); i++) {
@@ -227,12 +230,13 @@ DirectedGraph *createRandomDAGIter(int n) {
 WeightedGraph *createRandomCompleteWeightedGraph(int n) {
     WeightedGraph *ret = new WeightedGraph();
 
-    vector<WeightedNode *> tmp;
+    vector<Node *> tmp;
 
     for (int i = 0; i < n; i++) {
         ret->addNode(getNodeName(i));
     }
 
+    //copies unordered_set nodes into a temporary vector for random access
     copy(ret->getAllNodes().begin(), ret->getAllNodes().end(), back_inserter(tmp));
 
     for (auto from = tmp.begin(); from != tmp.end(); from++) {
@@ -255,10 +259,10 @@ WeightedGraph *createWeightedLinkedList(int n) {
         g->addNode(getNodeName(i));
     }
 
-    unordered_set<WeightedNode *> nodes = g->getAllNodes();
+    unordered_set<Node *> nodes = g->getAllNodes();
 
     auto i = nodes.begin();
-    WeightedNode *tmp = *i;
+    Node *tmp = *i;
     i++;
     for ( ; i != nodes.end(); i++) {
         g->addWeightedEdge(tmp, *i, 1);
@@ -268,26 +272,19 @@ WeightedGraph *createWeightedLinkedList(int n) {
     return g;
 }
 
-
-/*struct CompareNode {
-    bool operator()(pair<WeightedNode *, int> const& a, pair<WeightedNode *, int> const& b) {
-        return a.second < b.second;
-    }
-};*/
-
-WeightedNode *getNextMinNode(unordered_map<WeightedNode *, bool> &visited, unordered_map<WeightedNode *, int> &distance) {
-    WeightedNode *minNode = nullptr;
+Node *getNextMinNode(unordered_map<Node *, bool> &visited, unordered_map<Node *, int> &distance, Node *dest, int heuristic(Node *, Node *)) {
+    Node *minNode = nullptr;
     int minDist = 0;
 
-    for (pair<WeightedNode *, bool> p : visited) {
+    for (pair<Node *, bool> p : visited) {
         if (!p.second) {
             if (minNode == nullptr) {
-                minNode = p.first;
-                minDist = distance[p.first];
+                minNode = (Node *)p.first;
+                minDist = distance[p.first] + heuristic(p.first, dest);
             }
             else if (distance[p.first] < minDist) {
                 minNode = p.first;
-                minDist = distance[p.first];
+                minDist = distance[p.first] + heuristic(p.first, dest);
             }
         }
     }
@@ -295,33 +292,29 @@ WeightedNode *getNextMinNode(unordered_map<WeightedNode *, bool> &visited, unord
     return minNode;
 }
 
-unordered_map<WeightedNode *, int> *dijkstras(WeightedNode *start) {
-    unordered_map<WeightedNode *, int> *distance = new unordered_map<WeightedNode *, int>();
-    unordered_map<WeightedNode *, WeightedNode *> parent;
-    unordered_map<WeightedNode *, bool> visited;
+int dummyDijkstrasHeuristic(Node * n, Node * m) {
+    return 0;
+}
 
-    //priority_queue<pair<WeightedNode *, int>, vector<pair<WeightedNode *, int>>, CompareNode> q;
+unordered_map<Node *, int> *dijkstras(Node *start) {
+    unordered_map<Node *, int> *distance = new unordered_map<Node *, int>();
+    unordered_map<Node *, Node *> parent;
+    unordered_map<Node *, bool> visited;
 
     (*distance)[start] = 0;
     parent[start] = nullptr;
     visited[start] = false;
-    //q.push(make_pair(start, distance[start]));
 
-    /*while (q.size() != 0) {
-        WeightedNode *n = q.top().first;
-        q.pop();*/
-
-    WeightedNode *n;
-    while ( (n = getNextMinNode(visited, *distance)) != nullptr ) {
+    Node *n;
+    while ( (n = getNextMinNode(visited, *distance, nullptr, &dummyDijkstrasHeuristic)) != nullptr ) {
         visited[n] = true;
 
-        for (pair<WeightedNode *, int> p : n->neighbors) {
+        for (pair<Node *, int> p : n->neighbors) {
             if (visited.find(p.first) != visited.end() || !visited[p.first]) {
                 int dist = (*distance)[n] + p.second;
                 if (distance->find(p.first) == distance->end()) {
                     (*distance)[p.first] = dist;
                     parent[p.first] = n;
-                    //q.push(make_pair(p.first, dist));
                     visited[p.first] = false;
                 }
                 else if (dist < (*distance)[p.first]) {
@@ -373,65 +366,34 @@ GridGraph *createRandomGridGraph(int n) {
     return gg;
 }
 
-int getManhattanDistance(GridNode *src, GridNode *dst) {
-    int xDiff = src->x - dst->x;
-    if (xDiff < 0)
-        xDiff *= -1;
+int getManhattanDistance(Node *src, Node *dst) {
+    int xDiff = abs(((GridNode *)src)->x - ((GridNode *)dst)->x);
 
-    int yDiff = src->y - dst->y;
-    if (yDiff < 0)
-        yDiff *= -1;
+    int yDiff = abs(((GridNode *)src)->y - ((GridNode *)dst)->y);
 
     return xDiff + yDiff;
 }
 
-GridNode *getNextMinNodeAStar(unordered_map<GridNode *, bool> &visited, unordered_map<GridNode *, int> &distance, GridNode *dest) {
-    GridNode *minNode = nullptr;
-    int minDist = 0;
-
-    for (pair<GridNode *, bool> p : visited) {
-        if (!p.second) {
-            if (minNode == nullptr) {
-                minNode = p.first;
-                minDist = distance[p.first] + getManhattanDistance(p.first, dest);
-            }
-            else if (distance[p.first] < minDist) {
-                minNode = p.first;
-                minDist = distance[p.first] + getManhattanDistance(p.first, dest);
-            }
-        }
-    }
-
-    return minNode;
-}
-
 vector<GridNode *> *astar(GridNode *sourceNode, GridNode *destNode) {
-    unordered_map<GridNode *, int> distance;
-    unordered_map<GridNode *, GridNode *> parent;
-    unordered_map<GridNode *, bool> visited;
-
-    //priority_queue<pair<WeightedNode *, int>, vector<pair<WeightedNode *, int>>, CompareNode> q;
+    unordered_map<Node *, int> distance;
+    unordered_map<Node *, Node *> parent;
+    unordered_map<Node *, bool> visited;
 
     distance[sourceNode] = 0;
     parent[sourceNode] = nullptr;
     visited[sourceNode] = false;
-    //q.push(make_pair(start, distance[start]));
 
-    /*while (q.size() != 0) {
-        WeightedNode *n = q.top().first;
-        q.pop();*/
-
-    GridNode *n;
-    while ( (n = getNextMinNodeAStar(visited, distance, destNode)) != nullptr ) {
+    Node *n;
+    while ( (n = getNextMinNode(visited, distance, destNode, getManhattanDistance)) != nullptr ) {
         visited[n] = true;
 
-        for (GridNode * m : n->neighbors) {
+        for (pair<Node *, int> p : n->neighbors) {
+            GridNode *m = (GridNode *)p.first;
             if (visited.find(m) != visited.end() || !visited[m]) {
                 int dist = distance[n] + 1;
                 if (distance.find(m) == distance.end()) {
                     distance[m] = dist;
                     parent[m] = n;
-                    //q.push(make_pair(p.first, dist));
                     visited[m] = false;
                 }
                 else if (dist < distance[m]) {
@@ -450,7 +412,7 @@ vector<GridNode *> *astar(GridNode *sourceNode, GridNode *destNode) {
 
     while (tmp != nullptr) {
         s.push(tmp);
-        tmp = parent[tmp];
+        tmp = (GridNode *)parent[tmp];
     }
 
     vector<GridNode *> *ret = new vector<GridNode *>();
@@ -473,13 +435,11 @@ int main() {
     //problem 3c
     cout << endl << "Linked list: " << endl;
     createLinkedList(10)->printGraph();
-
+    
     //Problem 3d
     Graph *g = createRandomUnweightedGraphIter(26);
         cout << endl << "Graph: " << endl;
     g->printGraph();
-
-    unordered_set<Node *> nodes = g->getAllNodes();
 
     Node *start = g->getNode("A");
     Node *end = g->getNode("Z");
@@ -495,8 +455,6 @@ int main() {
     g = createRandomUnweightedGraphIter(26);
     cout << endl << "Graph: " << endl;
     g->printGraph();
-
-    nodes = g->getAllNodes();
 
     start = g->getNode("A");
     end = g->getNode("Z");
@@ -567,19 +525,17 @@ int main() {
     wg = createRandomWeightedGraph(10);
     cout << endl << "Weighted graph: " << endl;
     wg->printGraph();
-    unordered_map<WeightedNode *, int> *result = dijkstras(wg->getNode("A"));
+    unordered_map<Node *, int> *result = dijkstras(wg->getNode("A"));
     printDijkstra(result);
 
     //Problem 6b
     GridGraph *gg = createRandomGridGraph(4);
-    //gg->printGraphDBG();
     cout << endl << "Grid graph: " << endl;
     gg->printGraph();
-
+    
     //Problem 6d
-    int gridsize = 100;
+    int gridsize = 10;
     gg = createRandomGridGraph(gridsize);
-    //gg->printGraphDBG();
     cout << endl << "Grid graph: " << endl;
     gg->printGraph();
     vector<GridNode *> *gpath = astar(gg->getNode("(0, 0)"), gg->getNode("(" + to_string(gridsize) + ", " + to_string(gridsize) + ")"));

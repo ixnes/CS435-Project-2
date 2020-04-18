@@ -1,7 +1,7 @@
 #ifndef WEIGHTEDGRAPH_H
 #define WEIGHTEDGRAPH_H
 
-#include "WeightedNode.h"
+#include "Node.h"
 
 #include <vector>
 #include <unordered_set>
@@ -11,17 +11,17 @@ using namespace std;
 
 class WeightedGraph {
 private:
-    unordered_set<WeightedNode *> nodes;
+    unordered_set<Node *> nodes;
 public:
     void addNode(string nodeVal);
-    void addWeightedEdge(WeightedNode *first, WeightedNode *second, int edgeWeight);
-    void removeWeightedEdge(WeightedNode *first, WeightedNode *second);
+    void addWeightedEdge(Node *first, Node *second, int edgeWeight);
+    void removeWeightedEdge(Node *first, Node *second);
 
-    unordered_set<WeightedNode *> getAllNodes() {
+    unordered_set<Node *> getAllNodes() {
         return nodes;
     }
 
-    WeightedNode *getNode(string name);
+    Node *getNode(string name);
 
     void printGraph();
 };

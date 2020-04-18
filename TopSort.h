@@ -29,12 +29,15 @@ private:
     static void mDFS_(Node *n, stack<Node *> *s) {
         setVisited(n);
 
-        for (Node * const& m: n->neighbors)
+        for (pair<Node *, int> p: n->neighbors) {
+            Node *m = p.first;
             if (!isVisited(m))
                 mDFS_(m, s);
+        }
         
         s->push(n);
     }
+
 public:
     static vector<Node *> *Kahns(DirectedGraph *graph) {
         vector<Node *> *ret = new vector<Node *>();
@@ -43,13 +46,15 @@ public:
 
         unordered_set<Node *> nodes = graph->getAllNodes();
 
+        //Initializing number of dependencies
         for (Node * const& n : nodes)
             numDependencies[n] = 0;
 
         for (Node * const& n : nodes) {
-            for (Node * const& m : n->neighbors)
-                numDependencies[m]++;
+            for (pair<Node *, int> p : n->neighbors)
+                numDependencies[p.first]++;
         }
+        //End intialization
 
         queue<Node *> q;
 
@@ -65,7 +70,8 @@ public:
 
             numDependencies[n] = -1;
 
-            for (Node * const& m : n->neighbors) {
+            for (pair<Node *, int> p : n->neighbors) {
+                Node * m = p.first;
                 numDependencies[m]--;
                 if (numDependencies[m] == 0)
                     q.push(m);

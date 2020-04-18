@@ -2,15 +2,16 @@
 #define NODE_H
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 using namespace std;
 
-typedef struct Node Node;
+//typedef struct Node Node;
 
-struct Node {
+class Node {
+public:
     string name;
-    vector<Node *> neighbors;
+    unordered_map<Node *, int> neighbors;
 
     Node(string s) {
         name = s;

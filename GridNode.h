@@ -1,24 +1,21 @@
 #ifndef GRIDNODE_H
 #define GRIDNODE_H
 
+#include "Node.h"
+
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 using namespace std;
 
-typedef struct GridNode GridNode;
-
-struct GridNode {
-    string name;
-    vector<GridNode *> neighbors;
-
+class GridNode : public Node {
+public:
     int x;
     int y;
 
-    GridNode(int xPos, int yPos, string s) {
-        x = xPos;
-        y = yPos;
-        name = s;
+    GridNode(int xPos, int yPos, string s) : Node(s) {
+        this->x = xPos;
+        this->y = yPos;
     }
 };
 
