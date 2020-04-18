@@ -357,7 +357,7 @@ GridGraph *createRandomGridGraph(int n) {
             //The approximation 0.293 gives a 0.500151 chance of
             //two neighbors being connected, which should be close enough
             //to 0.5 for this toy implementation
-            if (getRandomNumber(1, 1000) < 293) {
+            if (getRandomNumber(1, 1000) <= 293) {
                 gg->addUndirectedEdge(a, b);
             }
         }
@@ -534,7 +534,7 @@ int main() {
     gg->printGraph();
     
     //Problem 6d
-    int gridsize = 10;
+    int gridsize = 100;
     gg = createRandomGridGraph(gridsize);
     cout << endl << "Grid graph: " << endl;
     gg->printGraph();
